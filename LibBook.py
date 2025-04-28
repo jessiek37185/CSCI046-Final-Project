@@ -7,24 +7,19 @@ The system should keep track of book availability and allow efficient retrieval.
 Data Strucutres Used: Linked List, Heap/Priority Queue
 """
 
-import heapq
+from collections import deque
 
 # --- Book Class ---
 class Book:
-    def __init__(self, title, author, dewey_decimal):
+    def __init__(self, title, author, isbn, category):
         self.title = title
         self.author = author
-        self.dewey_decimal = dewey_decimal
+        self.isbn = isbn
+        self.category = category
         self.is_available = True
-        self.reservation_queue = [] # prio queue of (prio, username)
-
-    def reserve_book(self, username, prioprity=0):
-        heapq.heappush(self.reservation_queue, (priority, username))
-
-    def next_reservation(self):
-        if self.reservation_queue:
-            return heapq.heappop(self.rservation_queue)
-        return None
+        self.reservation_queue = deque() # Queue of users
+        
+        
 
 # --- Linked List Node for User History ---
 
