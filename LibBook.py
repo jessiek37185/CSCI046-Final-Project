@@ -19,9 +19,12 @@ class Book:
         self.is_available = True
         self.reservation_queue = deque() # Queue of users
         
-        
 
 # --- Linked List Node for User History ---
+class HistoryNode:
+    def __init__(self, book_isbn):
+        self.book_isbn = book_isbn
+        self.next = None
 
 # --- User Class ---
 
