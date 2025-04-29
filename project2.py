@@ -1,5 +1,15 @@
+"""
+Library Book Management System
+
+Design a system that allows users to check out, return and search for books in library.
+The system keeps track of book availability and allow efficient retrieval. 
+
+Data Strucutres Used: Linked List, Hashmap, Queue
+"""
+# --- Book Class --- 
 class Book:
     def __init__(self, isbn, title, author, category):
+        # basic book info
         self.isbn = isbn
         self.title = title
         self.author = author
@@ -7,22 +17,26 @@ class Book:
         self.available = True
         self.reservation_queue = Queue()
 
+    # enqueue a user to reserve the book
     def reserve_book(self, user):
         self.reservation_queue.enqueue(user)
 
+    # dequeue the next user waiting for book
     def next_in_queue(self):
         return self.reservation_queue.dequeue()
 
-
+# --- Linked List Node for Borrowing History ---
 class LinkedListNode:
     def __init__(self, book):
         self.book = book
         self.next = None
 
+# --- Borrowing History (Linked List) ---
 class BorrowHistory:
     def __init__(self):
         self.head = None
 
+    # Add a book to the end of user's borrowing history 
     def add_book(self, book):
         new_node = LinkedListNode(book)
         if not self.head:
@@ -33,30 +47,39 @@ class BorrowHistory:
                 current = current.next
             current.next = new_node
 
+    # Print the borrowing history
     def print_history(self):
         current = self.head
+        if not current:
+            print("No borrowing history.")
+            return
+        idx = 1
         while current:
-            print(f"- {current.book.title} by {current.book.author}")
+            print(f"{idx}.{current.book.title} by {current.book.author}")
             current = current.next
+            idx += 1
 
 
+# --- User Class --- 
 class User:
     def __init__(self, user_id, name):
         self.user_id = user_id
         self.name = name
         self.borrow_history = BorrowHistory()
 
-
+# --- Queue Node Class ---
 class QueueNode:
     def __init__(self, data):
         self.data = data
         self.next = None
 
+# --- Queue Class ---
 class Queue:
     def __init__(self):
         self.front = None
         self.rear = None
 
+    # enqueue data at the end
     def enqueue(self, data):
         new_node = QueueNode(data)
         if self.rear is None:
@@ -65,6 +88,7 @@ class Queue:
             self.rear.next = new_node
             self.rear = new_node
 
+    # dequeue data from the front
     def dequeue(self):
         if self.front is None:
             return None
@@ -74,10 +98,12 @@ class Queue:
             self.rear = None
         return temp.data
 
+    # check if queue is empty
     def is_empty(self):
         return self.front is None
 
 
+# --- Library System ---
 class Library:
     def __init__(self):
         self.books = {}  # HashMap: isbn -> Book
@@ -91,7 +117,7 @@ class Library:
         else:
             print("Book with this ISBN already exists.")
 
-    # Add user to the library system
+    # Add a new user to the library system
     def add_user(self, user_id, name):
         if user_id not in self.users:
             self.users[user_id] = User(user_id, name)
@@ -110,7 +136,9 @@ class Library:
                 results.append(book)
 
         if results:
-            print("Search Results:")
+            print("\n" + "="*50)
+            print(f" Search Results for '{keyword}' ".center(50, "-"))
+            print("="*50)
             for book in results:
                 status = "Available" if book.available else "Checked Out"
                 print(f"- {book.title} by {book.author} ({status})")
@@ -118,7 +146,7 @@ class Library:
             print("No books found.")
 
     # Checkout a book
-    def checkout_book(self, isbn, user_id):
+    def checkout_book(self, isbn, user_id, is_auto=False):
         if isbn in self.books and user_id in self.users:
             book = self.books[isbn]
             user = self.users[user_id]
@@ -126,9 +154,15 @@ class Library:
             if book.available:
                 book.available = False
                 user.borrow_history.add_book(book)
-                print(f"{user.name} checked out {book.title}.")
+                
+                print(f"\n✅ Successfully checked out:")
+                print(f"     - User: {self.users[user_id].name}")
+                print(f"     - Title: {book.title}")
+                print(f"     - Author: {book.author}")
+                print(f"     - Category: {book.category}")
             else:
-                print(f"{book.title} is not available. Adding {user.name} to reservation queue.")
+                if not is_auto: 
+                    print(f"\n❗ {book.title} is currently checked out. {user.name} has been added to the reservation queue. \n")
                 book.reserve_book(user)
         else:
             print("Invalid ISBN or User ID.")
@@ -140,11 +174,20 @@ class Library:
             if not book.available:
                 next_user = book.next_in_queue()
                 if next_user:
-                    print(f"Book returned. Reserved by {next_user.name}. Auto-checking out to them.")
-                    self.checkout_book(isbn, next_user.user_id)
+                    # before autho-checking out, mark book as available
+                    book.available = True
+
+                    print("\n" + "="*50)
+                    print(f"                   System Message")
+                    print("="*50)
+                    print(f"✅ {book.title} returned. Reserved by {next_user.name}. \n   Auto-checking out to them. \n")
+                    self.checkout_book(isbn, next_user.user_id, is_auto=True)
                 else:
                     book.available = True
-                    print(f"{book.title} is now available.")
+                    print("\n" + "="*50)
+                    print(f"                System Message")
+                    print("="*50)
+                    print(f"✅ {book.title} is now available.\n")
             else:
                 print("Book is already available.")
         else:
@@ -153,13 +196,16 @@ class Library:
     # View user's borrowing history
     def view_user_history(self, user_id):
         if user_id in self.users:
-            print(f"Borrowing History for {self.users[user_id].name}:")
+            print ("\n" + "="*50)
+            print(f"Borrowing History for {self.users[user_id].name} ".center(50, "-"))
+            print("="*50)
             self.users[user_id].borrow_history.print_history()
+            print("\n")
         else:
             print("User not found.")
 
 
-# Demo to show functionality
+# --- Demo to Show Functionality ---
 if __name__ == "__main__":
     library = Library()
 
@@ -181,10 +227,11 @@ if __name__ == "__main__":
     library.checkout_book("003", "U2")
     library.checkout_book("001", "U2")  # Bob tries to checkout same book -> gets added to reservation queue
 
+    # View user borrowing history
     library.view_user_history("U1")
     library.view_user_history("U2")
 
-    # Returning books
+    # Returning booksr
     library.return_book("001")  # Alice returns, Bob gets auto-checked out
 
     # Viewing history
