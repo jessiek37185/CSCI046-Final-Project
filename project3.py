@@ -4,7 +4,7 @@ Library Book Management System
 Design a system that allows users to check out, return and search for books in library.
 The system keeps track of book availability and allow efficient retrieval. 
 
-Data Strucutres Used: Linked List, Hashmap, Queue
+Data Strucutres Used: Linked List, Hashmap, Queue, Binary Search Tree
 """
 # --- Book Class --- 
 class Book:
@@ -38,10 +38,12 @@ class Book:
             for i, (name, role) in enumerate(queue, 1):
                 print(f"  {i}. {name} ({role})")
 
+from datetime import datetime, timedelta
 # --- Linked List Node for Borrowing History ---
 class LinkedListNode:
-    def __init__(self, book):
+    def __init__(self, book, due_date):
         self.book = book
+        self.due_date = due_date
         self.next = None
 
 # --- Borrowing History (Linked List) ---
@@ -50,8 +52,8 @@ class BorrowHistory:
         self.head = None
 
     # Add a book to the end of user's borrowing history 
-    def add_book(self, book):
-        new_node = LinkedListNode(book)
+    def add_book(self, book, due_date):
+        new_node = LinkedListNode(book, due_date)
         if not self.head:
             self.head = new_node
         else:
@@ -67,10 +69,30 @@ class BorrowHistory:
             print("No borrowing history.")
             return
         idx = 1
+        today = datetime.now()
         while current:
+            overdue_flag = "(OVERDUE)" if today > current.due_date else ""
+            due_str = current.due_date.strftime("%Y-%m-%d")
             print(f"{idx}.{current.book.title} by {current.book.author}")
             current = current.next
             idx += 1
+    
+    def print_overdue_books(self):
+        current = self.head
+        today = datetime.now()
+        has_overdue = False
+        idx = 1
+
+        while current:
+            if today > current.due_date:
+                due_str = current.due_date.strftime("%Y-%m-%d")
+                print(f"{idx}.{current.book.title} by {current.book.author}")
+                has_overdue = True
+                idx += 1
+            current = current.next
+
+        if not has_overdue:
+            print("No overdue books.")
 
 import time
 # --- User Class (BST) --- 
@@ -86,6 +108,8 @@ class User:
         # lower value = higher prio
         role_prio = {"professor": 1, "graduate": 2, "undergraduate": 3}
         return role_prio.get(self.role, 4) # default prio = 4
+    
+
     
 class BSTNode:
     def __init__(self,key,user):
@@ -221,16 +245,18 @@ class Library:
         if isbn in self.books and user_id in self.users:
             book = self.books[isbn]
             user = self.users[user_id]
+            due_date = datetime.now() + timedelta(days=14) # 2 weeks loan period
 
             if book.available:
                 book.available = False
-                user.borrow_history.add_book(book)
+                user.borrow_history.add_book(book, due_date)
                 
                 print(f"\n✅ Successfully checked out:")
                 print(f"     - User: {self.users[user_id].name}")
                 print(f"     - Title: {book.title}")
                 print(f"     - Author: {book.author}")
                 print(f"     - Category: {book.category}")
+                print(f"     - Due Date: {due_date.strftime('%Y-%m-%d')}")
             else:
                 if not is_auto: 
                     print(f"\n❗ {book.title} is currently checked out. {user.name} has been added to the reservation queue. \n")
@@ -282,6 +308,13 @@ class Library:
         else:
             print("❌ Book not found.")
 
+    def view_overdue_books(self, user_id):
+        if user_id in self.users:
+            print(f"\nOverdue Books for {self.users[user_id].name}:")
+            self.users[user_id].borrow_history.print_overdue_books()
+        else:
+            print("User not found.")
+
 # --- Demo to Show Functionality ---
 if __name__ == "__main__":
     library = Library()
@@ -308,11 +341,15 @@ if __name__ == "__main__":
 
     # Viewing Queue Line
     library.show_reservation_line("001")
-    
+
+    # View overdue books
+    library.view_overdue_books("U1")
+
     # View user borrowing history
     library.view_user_history("U1")
     library.view_user_history("U2")
     library.view_user_history("U3")
+
 
     # Returning books
     library.return_book("001")  # Alice returns, prof Bob gets auto-checked out
