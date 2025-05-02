@@ -123,7 +123,7 @@ class Library:
 
     # Add book to the library
     def add_book(self, isbn, title, author, category):
-        if isbn not in self.books:
+        if isbn not in self.books: #edge case: isbn not found
             self.books[isbn] = Book(isbn, title, author, category)
             print(f"Added book: {title}.")
         else:
@@ -131,7 +131,7 @@ class Library:
 
     # Add a new user to the library system
     def add_user(self, user_id, name):
-        if user_id not in self.users:
+        if user_id not in self.users: #edge case: user id not found
             self.users[user_id] = User(user_id, name)
             print(f"User {name} added.")
         else:
@@ -154,7 +154,7 @@ class Library:
             for book in results:
                 status = "Available" if book.available else "Checked Out"
                 print(f"- {book.title} by {book.author} ({status})")
-        else:
+        else: #edge case: book not found
             print("No books found.")
 
     # Checkout a book
