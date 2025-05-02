@@ -78,29 +78,41 @@ class Queue:
     def __init__(self):
         self.front = None
         self.rear = None
-
+        
+    def is_empty(self):
+        return self.front is None
+        
     # enqueue data at the end
     def enqueue(self, data):
         new_node = QueueNode(data)
-        if self.rear is None:
+        if self.is_empty():
             self.front = self.rear = new_node
         else:
             self.rear.next = new_node
             self.rear = new_node
-
+        self.size += 1
+        print(f"📚 Enqueued: {data.name}")
+        
     # dequeue data from the front
     def dequeue(self):
-        if self.front is None:
+        if self.is_empty():
+            print("⚠️ Queue is empty. Nothing to dequeue.")
             return None
         temp = self.front
         self.front = temp.next
         if self.front is None:
             self.rear = None
+        self.size -= 1
+        print(f"✅ Dequeued: {temp.data.name}")
         return temp.data
 
-    # check if queue is empty
-    def is_empty(self):
-        return self.front is None
+    def peek(self):
+        if self.is_empty():
+            return None
+        return self.front.data
+
+    def __len__(self):
+        return self.size
 
 
 # --- Library System ---
