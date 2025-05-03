@@ -87,19 +87,19 @@ class Queue:
             self.rear.next = new_node
             self.rear = new_node
         self.size += 1
-        print(f"📚 Enqueued: {data.name}")
+        print(f"Enqueued: {data.name}")
         
     # remove data from the front
     def dequeue(self):
         if self.is_empty():
-            print("⚠️ Queue is empty. Nothing to dequeue.")
+            print("Queue is empty. Nothing to dequeue.")
             return None
         temp = self.front
         self.front = temp.next
         if self.front is None:
             self.rear = None
         self.size -= 1
-        print(f"✅ Dequeued: {temp.data.name}") # using emojis to make it more colorful and UI friendly
+        print(f"Dequeued: {temp.data.name}") # using emojis to make it more colorful and UI friendly
         return temp.data
 
     def peek(self):
@@ -205,7 +205,7 @@ class Library:
                 book.available = False
                 user.borrow_history.add_book(book)
 
-                print(f"\n✅ Successfully checked out:")
+                print(f"\n Successfully checked out:")
                 print(f"     - User: {self.users[user_id].name}")
                 print(f"     - Title: {book.title}")
                 print(f"     - Author: {book.author}")
@@ -213,7 +213,7 @@ class Library:
             else:
                 if not is_auto:
                     if self.organization:
-                        print(f"\n❗ {book.title} is currently checked out. {user.name} is looking for available copies in other libraries...\n")
+                        print(f"\n {book.title} is currently checked out. {user.name} is looking for available copies in other libraries...\n")
 
                         current = self.organization.head
                         found_elsewhere = False
@@ -222,7 +222,7 @@ class Library:
                                 if isbn in current.library.books:
                                     other_book = current.library.books[isbn]
                                     if other_book.available:
-                                        print(f"✅ Found available copy of '{book.title}' at {current.name}. Checking it out there instead!")
+                                        print(f" Found available copy of '{book.title}' at {current.name}. Checking it out there instead!")
 
                                         if user_id not in current.library.users:
                                             current.library.add_user(user_id, user.name)
@@ -233,17 +233,17 @@ class Library:
                             current = current.next
 
                         if not found_elsewhere:
-                            print(f"📚 No available copies found in other libraries. {user.name} has been added to the reservation queue.\n")
+                            print(f"No available copies found in other libraries. {user.name} has been added to the reservation queue.\n")
                             book.reserve_book(user)
                     else:
                         # No organization to search, just reserve
-                        print(f"\n❗ {book.title} is currently checked out. {user.name} has been added to the reservation queue.\n")
+                        print(f"\n {book.title} is currently checked out. {user.name} has been added to the reservation queue.\n")
                         book.reserve_book(user)
                 else:
                     book.reserve_book(user)
 
         elif isbn not in self.books and user_id in self.users:
-            print(f"\n📚 {isbn} not found in {self.name}. Searching other libraries in the organization...")
+            print(f"\n {isbn} not found in {self.name}. Searching other libraries in the organization...")
 
             # Search other libraries for the book and check it out there
             current = self.organization.head
@@ -251,7 +251,7 @@ class Library:
             while current:
                 if current.name != self.name:
                     if isbn in current.library.books:
-                        print(f"✅ Found {isbn} in {current.name}! Checking out from there...")
+                        print(f"Found {isbn} in {current.name}! Checking out from there...")
 
                         user = self.users[user_id]
                         if user_id not in current.library.users:
@@ -263,7 +263,7 @@ class Library:
                 current = current.next
 
             if not found:
-                print(f"❌ Book with ISBN {isbn} not found in any library in the organization.")
+                print(f"Book with ISBN {isbn} not found in any library in the organization.")
 
         else:
             print("Invalid ISBN or User ID.")
@@ -280,14 +280,14 @@ class Library:
                     print("\n" + "="*50)
                     print(f"                   System Message")
                     print("="*50)
-                    print(f"✅ {book.title} returned. Reserved by {next_user.name}. \n   Auto-checking out to them. \n")
+                    print(f"{book.title} returned. Reserved by {next_user.name}. \n   Auto-checking out to them. \n")
                     self.checkout_book(isbn, next_user.user_id, is_auto=True)
                 else:
                     book.available = True
                     print("\n" + "="*50)
                     print(f"                System Message")
                     print("="*50)
-                    print(f"✅ {book.title} is now available.\n")
+                    print(f"{book.title} is now available.\n")
             else:
                 print("Book is already available.")
         else:
@@ -304,7 +304,7 @@ class Library:
             print("User not found.")
 
 
-print("\n🚀 Initializing 5C Consortium and Libraries...")
+print("\n Initializing 5C Consortium and Libraries...")
 
 if __name__ == "__main__":
     import time
@@ -322,7 +322,7 @@ if __name__ == "__main__":
     pomona_lib = harvey_mudd_lib.next
     claremont_lib = pomona_lib.next
 
-    print("\n✅ Current Libraries in 5C Consortium:")
+    print("\nCurrent Libraries in 5C Consortium:")
     current = fiveCConsortium.head
     idx = 1
     while current:
@@ -332,14 +332,14 @@ if __name__ == "__main__":
 
     time.sleep(2)
 
-    print("\n📚 STEP 2: Add Books to Each Library")
+    print("\n STEP 2: Add Books to Each Library")
     harvey_mudd_lib.library.add_book("001", "The Great Gatsby", "F. Scott Fitzgerald", "Fiction")
     pomona_lib.library.add_book("002", "1984", "George Orwell", "Dystopian")
     claremont_lib.library.add_book("003", "The Art of Computer Programming", "Donald Knuth", "Computer Science")
 
     time.sleep(2)
 
-    print("\n👤 STEP 3: Add Users to Each Library")
+    print("\nSTEP 3: Add Users to Each Library")
     harvey_mudd_lib.library.add_user("U1", "Alice")
     harvey_mudd_lib.library.add_user("U2", "Bob")
     pomona_lib.library.add_user("U3", "Charlie")
@@ -348,54 +348,54 @@ if __name__ == "__main__":
 
     time.sleep(2)
 
-    print("\n🔎 STEP 4: Search for 'Fiction' in Harvey Mudd Library (should find 'The Great Gatsby')")
+    print("\n STEP 4: Search for 'Fiction' in Harvey Mudd Library (should find 'The Great Gatsby')")
     harvey_mudd_lib.library.search_books("Fiction")
 
     time.sleep(2)
 
-    print("\n✅ STEP 5: Alice Checks Out 'The Great Gatsby' at Harvey Mudd Library")
+    print("\n STEP 5: Alice Checks Out 'The Great Gatsby' at Harvey Mudd Library")
     harvey_mudd_lib.library.checkout_book("001", "U1")
 
     time.sleep(2)
 
-    print("\n❗ STEP 6: Bob Tries to Check Out 'The Great Gatsby' (already checked out) at Harvey Mudd Library")
+    print("\n STEP 6: Bob Tries to Check Out 'The Great Gatsby' (already checked out) at Harvey Mudd Library")
     harvey_mudd_lib.library.checkout_book("001", "U2")
 
     time.sleep(2)
 
-    print("\n✅ STEP 7: Charlie Checks Out '1984' at Pomona Library")
+    print("\n STEP 7: Charlie Checks Out '1984' at Pomona Library")
     pomona_lib.library.checkout_book("002", "U3")
 
     time.sleep(2)
 
-    print("\n✅ STEP 8: Diana Checks Out 'The Art of Computer Programming' at Claremont Library")
+    print("\n STEP 8: Diana Checks Out 'The Art of Computer Programming' at Claremont Library")
     claremont_lib.library.checkout_book("003", "U4")
 
     time.sleep(2)
 
-    print("\n🌐 STEP 9: Eve Tries to Check Out '1984' at Harvey Mudd Library (should find in Pomona)")
+    print("\n STEP 9: Eve Tries to Check Out '1984' at Harvey Mudd Library (should find in Pomona)")
     harvey_mudd_lib.library.checkout_book("002", "U5")
 
     time.sleep(2)
 
-    print("\n📖 STEP 10: Borrowing History in Harvey Mudd Library (Alice, Bob, Eve)")
+    print("\n STEP 10: Borrowing History in Harvey Mudd Library (Alice, Bob, Eve)")
     harvey_mudd_lib.library.view_user_history("U1")
     harvey_mudd_lib.library.view_user_history("U2")
     harvey_mudd_lib.library.view_user_history("U5")
 
     time.sleep(2)
 
-    print("\n📖 Borrowing History in Pomona Library (Charlie)")
+    print("\n Borrowing History in Pomona Library (Charlie)")
     pomona_lib.library.view_user_history("U3")
 
     time.sleep(2)
 
-    print("\n📖 Borrowing History in Claremont Library (Diana)")
+    print("\n Borrowing History in Claremont Library (Diana)")
     claremont_lib.library.view_user_history("U4")
 
     time.sleep(2)
 
-    print("\n🔄 STEP 11: Alice Returns 'The Great Gatsby' at Harvey Mudd Library (Bob Should Auto-Checkout)")
+    print("\n STEP 11: Alice Returns 'The Great Gatsby' at Harvey Mudd Library (Bob Should Auto-Checkout)")
     harvey_mudd_lib.library.return_book("001")
 
     time.sleep(2)
@@ -406,12 +406,12 @@ if __name__ == "__main__":
 
     time.sleep(2)
 
-    print("\n⚠️ STEP 13: Try to Return 'The Great Gatsby' Again (Already Available)")
+    print("\n⚠ STEP 13: Try to Return 'The Great Gatsby' Again (Already Available)")
     harvey_mudd_lib.library.return_book("001")
 
     time.sleep(2)
 
-    print("\n🏛️ STEP 14: Final Snapshot of Libraries in 5C Consortium")
+    print("\n STEP 14: Final Snapshot of Libraries in 5C Consortium")
     current = fiveCConsortium.head
     idx = 1
     while current:
