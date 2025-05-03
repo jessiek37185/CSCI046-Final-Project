@@ -234,7 +234,7 @@ class Library:
                             current = current.next
 
                         if not found_elsewhere:
-                            print(f"📚 No available copies found in other libraries. {user.name} has been added to the reservation queue.\n")
+                            print(f" No available copies found in other libraries. {user.name} has been added to the reservation queue.\n")
                             book.reserve_book(user)
                     else:
                         # No organization to search, just reserve
