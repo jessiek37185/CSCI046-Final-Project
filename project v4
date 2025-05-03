@@ -6,10 +6,9 @@ The system keeps track of book availability and allow efficient retrieval.
 
 Data Strucutres Used: Linked List, Hashmap, Queue
 """
-# --- Book Class --- 
+# Book Class 
 class Book:
     def __init__(self, isbn, title, author, category):
-        # basic book info
         self.isbn = isbn
         self.title = title
         self.author = author
@@ -17,26 +16,23 @@ class Book:
         self.available = True
         self.reservation_queue = Queue()
 
-    # enqueue a user to reserve the book
     def reserve_book(self, user):
         self.reservation_queue.enqueue(user)
 
-    # dequeue the next user waiting for book
     def next_in_queue(self):
         return self.reservation_queue.dequeue()
 
-# --- Linked List Node for Borrowing History ---
+# the linked list node which is for the borrowing history
 class LinkedListNode:
     def __init__(self, book):
         self.book = book
         self.next = None
 
-# --- Borrowing History (Linked List) ---
+# Borrowing History where we use a linked list
 class BorrowHistory:
     def __init__(self):
         self.head = None
 
-    # Add a book to the end of user's borrowing history 
     def add_book(self, book):
         new_node = LinkedListNode(book)
         if not self.head:
@@ -47,7 +43,6 @@ class BorrowHistory:
                 current = current.next
             current.next = new_node
 
-    # Print the borrowing history
     def print_history(self):
         current = self.head
         if not current:
@@ -60,20 +55,20 @@ class BorrowHistory:
             idx += 1
 
 
-# --- User Class --- 
+# User Class 
 class User:
     def __init__(self, user_id, name):
         self.user_id = user_id
         self.name = name
         self.borrow_history = BorrowHistory()
 
-# --- Queue Node Class ---
+# Queue Node Class
 class QueueNode:
     def __init__(self, data):
         self.data = data
         self.next = None
 
-# --- Queue Class ---
+# Queue Class 
 class Queue:
     def __init__(self):
         self.front = None
@@ -83,7 +78,7 @@ class Queue:
     def is_empty(self):
         return self.front is None
         
-    # enqueue data at the end
+    # add data at the end 
     def enqueue(self, data):
         new_node = QueueNode(data)
         if self.is_empty():
@@ -94,7 +89,7 @@ class Queue:
         self.size += 1
         print(f"📚 Enqueued: {data.name}")
         
-    # dequeue data from the front
+    # remove data from the front
     def dequeue(self):
         if self.is_empty():
             print("⚠️ Queue is empty. Nothing to dequeue.")
@@ -104,7 +99,7 @@ class Queue:
         if self.front is None:
             self.rear = None
         self.size -= 1
-        print(f"✅ Dequeued: {temp.data.name}")
+        print(f"✅ Dequeued: {temp.data.name}") # using emojis to make it more colorful and UI friendly
         return temp.data
 
     def peek(self):
@@ -159,15 +154,14 @@ class Organization: #stack
 
     
 
-# --- Library System ---
+# Library System where we use a hash table
 class Library:
     def __init__(self,name, organization):
-        self.books = {}  # HashMap: isbn -> Book
-        self.users = {}  # HashMap: user_id -> User
+        self.books = {}  
+        self.users = {}  
         self.name = name
         self.organization = organization
 
-    # Add book to the library
     def add_book(self, isbn, title, author, category):
         if isbn not in self.books: #edge case: isbn existed
             self.books[isbn] = Book(isbn, title, author, category)
@@ -175,15 +169,14 @@ class Library:
         else:
             print("Book with this ISBN already exists.")
 
-    # Add a new user to the library system
     def add_user(self, user_id, name):
-        if user_id not in self.users: #edge case: user id existed
+        if user_id not in self.users: 
             self.users[user_id] = User(user_id, name)
             print(f"User {name} added.")
         else:
             print("User already exists.")
 
-    # Search book by title, author, ISBN, or category
+    # keywords are basically title, author, ISBN, or category
     def search_books(self, keyword):
         results = []
         for book in self.books.values():
@@ -200,10 +193,9 @@ class Library:
             for book in results:
                 status = "Available" if book.available else "Checked Out"
                 print(f"- {book.title} by {book.author} ({status})")
-        else: #edge case: book not found
+        else: 
             print("No books found.")
 
-    # Checkout a book
     def checkout_book(self, isbn, user_id, is_auto=False):
         if isbn in self.books and user_id in self.users:
             book = self.books[isbn]
@@ -223,7 +215,6 @@ class Library:
                     if self.organization:
                         print(f"\n❗ {book.title} is currently checked out. {user.name} is looking for available copies in other libraries...\n")
 
-                        # Search other libraries first
                         current = self.organization.head
                         found_elsewhere = False
                         while current:
@@ -233,7 +224,6 @@ class Library:
                                     if other_book.available:
                                         print(f"✅ Found available copy of '{book.title}' at {current.name}. Checking it out there instead!")
 
-                                        # ✅ Add user to the other library if not already registered
                                         if user_id not in current.library.users:
                                             current.library.add_user(user_id, user.name)
 
@@ -250,11 +240,9 @@ class Library:
                         print(f"\n❗ {book.title} is currently checked out. {user.name} has been added to the reservation queue.\n")
                         book.reserve_book(user)
                 else:
-                    # Auto-checkout case (no searching)
                     book.reserve_book(user)
 
         elif isbn not in self.books and user_id in self.users:
-            # Book doesn't exist in this library, but user exists
             print(f"\n📚 {isbn} not found in {self.name}. Searching other libraries in the organization...")
 
             # Search other libraries for the book and check it out there
@@ -265,7 +253,6 @@ class Library:
                     if isbn in current.library.books:
                         print(f"✅ Found {isbn} in {current.name}! Checking out from there...")
 
-                        # ✅ Add user to the other library if not already registered
                         user = self.users[user_id]
                         if user_id not in current.library.users:
                             current.library.add_user(user_id, user.name)
@@ -281,7 +268,6 @@ class Library:
         else:
             print("Invalid ISBN or User ID.")
 
-    # Return a book
     def return_book(self, isbn):
         if isbn in self.books:
             book = self.books[isbn]
@@ -307,7 +293,6 @@ class Library:
         else:
             print("Invalid ISBN.")
 
-    # View user's borrowing history
     def view_user_history(self, user_id):
         if user_id in self.users:
             print ("\n" + "="*50)
@@ -322,16 +307,17 @@ class Library:
 print("\n🚀 Initializing 5C Consortium and Libraries...")
 
 if __name__ == "__main__":
-    # 1️⃣ Initialize the consortium
+    import time
+
     fiveCConsortium = Organization()
 
-    # Add libraries to the consortium
     print("\n🛠️ STEP 1: Add Libraries to Consortium")
     fiveCConsortium.addNewLibrary("Claremont Library", "123 College Ave", 1500)
     fiveCConsortium.addNewLibrary("Pomona Library", "456 University St", 1200)
     fiveCConsortium.addNewLibrary("Harvey Mudd Library", "789 Tech Blvd", 900)
 
-    # Access libraries (stack: Harvey Mudd -> Pomona -> Claremont)
+    time.sleep(3)
+
     harvey_mudd_lib = fiveCConsortium.head
     pomona_lib = harvey_mudd_lib.next
     claremont_lib = pomona_lib.next
@@ -344,13 +330,15 @@ if __name__ == "__main__":
         current = current.next
         idx += 1
 
-    # 2️⃣ Add books to each library
+    time.sleep(2)
+
     print("\n📚 STEP 2: Add Books to Each Library")
     harvey_mudd_lib.library.add_book("001", "The Great Gatsby", "F. Scott Fitzgerald", "Fiction")
     pomona_lib.library.add_book("002", "1984", "George Orwell", "Dystopian")
     claremont_lib.library.add_book("003", "The Art of Computer Programming", "Donald Knuth", "Computer Science")
 
-    # 3️⃣ Add users to each library
+    time.sleep(2)
+
     print("\n👤 STEP 3: Add Users to Each Library")
     harvey_mudd_lib.library.add_user("U1", "Alice")
     harvey_mudd_lib.library.add_user("U2", "Bob")
@@ -358,56 +346,71 @@ if __name__ == "__main__":
     claremont_lib.library.add_user("U4", "Diana")
     harvey_mudd_lib.library.add_user("U5", "Eve") 
 
-    # 4️⃣ Search for a book
+    time.sleep(2)
+
     print("\n🔎 STEP 4: Search for 'Fiction' in Harvey Mudd Library (should find 'The Great Gatsby')")
     harvey_mudd_lib.library.search_books("Fiction")
 
-    # 5️⃣ Normal checkout at Harvey Mudd
+    time.sleep(2)
+
     print("\n✅ STEP 5: Alice Checks Out 'The Great Gatsby' at Harvey Mudd Library")
     harvey_mudd_lib.library.checkout_book("001", "U1")
 
-    # 6️⃣ Try to check out the same book (reservation + inter-org search)
+    time.sleep(2)
+
     print("\n❗ STEP 6: Bob Tries to Check Out 'The Great Gatsby' (already checked out) at Harvey Mudd Library")
     harvey_mudd_lib.library.checkout_book("001", "U2")
 
-    # 7️⃣ Normal checkout at Pomona Library
+    time.sleep(2)
+
     print("\n✅ STEP 7: Charlie Checks Out '1984' at Pomona Library")
     pomona_lib.library.checkout_book("002", "U3")
 
-    # 8️⃣ Normal checkout at Claremont Library
+    time.sleep(2)
+
     print("\n✅ STEP 8: Diana Checks Out 'The Art of Computer Programming' at Claremont Library")
     claremont_lib.library.checkout_book("003", "U4")
 
-    # 9️⃣ Cross-library checkout (book doesn’t exist locally)
+    time.sleep(2)
+
     print("\n🌐 STEP 9: Eve Tries to Check Out '1984' at Harvey Mudd Library (should find in Pomona)")
     harvey_mudd_lib.library.checkout_book("002", "U5")
 
-    # 🔟 View borrowing history BEFORE any returns
+    time.sleep(2)
+
     print("\n📖 STEP 10: Borrowing History in Harvey Mudd Library (Alice, Bob, Eve)")
     harvey_mudd_lib.library.view_user_history("U1")
     harvey_mudd_lib.library.view_user_history("U2")
     harvey_mudd_lib.library.view_user_history("U5")
 
+    time.sleep(2)
+
     print("\n📖 Borrowing History in Pomona Library (Charlie)")
     pomona_lib.library.view_user_history("U3")
+
+    time.sleep(2)
 
     print("\n📖 Borrowing History in Claremont Library (Diana)")
     claremont_lib.library.view_user_history("U4")
 
-    # 🔄 Return book & trigger auto-checkout
+    time.sleep(2)
+
     print("\n🔄 STEP 11: Alice Returns 'The Great Gatsby' at Harvey Mudd Library (Bob Should Auto-Checkout)")
     harvey_mudd_lib.library.return_book("001")
 
-    # 🔁 View borrowing history AFTER return + auto-checkout
+    time.sleep(2)
+
     print("\n📖 STEP 12: Updated Borrowing History in Harvey Mudd Library (Alice and Bob)")
     harvey_mudd_lib.library.view_user_history("U1")
     harvey_mudd_lib.library.view_user_history("U2")
 
-    # ⚠️ Test: returning a book that's already available (edge case)
+    time.sleep(2)
+
     print("\n⚠️ STEP 13: Try to Return 'The Great Gatsby' Again (Already Available)")
     harvey_mudd_lib.library.return_book("001")
 
-    # ✅ Final consortium snapshot
+    time.sleep(2)
+
     print("\n🏛️ STEP 14: Final Snapshot of Libraries in 5C Consortium")
     current = fiveCConsortium.head
     idx = 1
@@ -415,5 +418,7 @@ if __name__ == "__main__":
         print(f"{idx}. {current.name} | Address: {current.address} | Students: {current.studentCount}")
         current = current.next
         idx += 1
+    
+    time.sleep(2)
 
     print(f"\nTotal libraries in 5C Consortium: {fiveCConsortium.count}")
